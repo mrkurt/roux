@@ -1,0 +1,20 @@
+{ "name": "roux"
+, "description": "A map/reduce helper library for MongoDB"
+, "author": "Kurt Mackey"
+, "version": "0.1.0"
+, "repository":
+  { "type": "git"
+  , "url": "https://github.com/mrkurt/roux.git"
+  }
+, "main": "./lib/index.js"
+, "dependencies":
+  { "mongodb" : "~0.9"
+  }
+, "devDependencies":
+  { "nodeunit": ">=0.5.0"
+  , "coffee-script": ">=1.1.1"
+  , "watch-tree": ">=0.1.1"
+  }
+, "engines":
+  { "node": "~0.4"}
+}
