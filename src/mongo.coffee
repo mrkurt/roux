@@ -40,4 +40,29 @@ class Mongo
       return
     return
 
+  collection : (name)->
+    new Collection(@, name)
+
+class Collection
+  constructor : (@db, @name)->
+
+  command : (cmd,args...)->
+    cb = args[args.length - 1]
+    unless typeof cb is 'function'
+      cb = (err, result)-> undefined
+
+    @db.useCollection @name, (error, c)=>
+      if error?
+        @db.logger error
+        cb(error, undefined)
+        return
+      c[cmd].apply(c, args)
+      return
+
+  insert : (docs, options, cb)->
+    @command('insert', docs, options, cb)
+
+  update : (selector, document, options, cb)->
+    @command('update', selector, document, options, cb)
+
 exports.Mongo = Mongo
