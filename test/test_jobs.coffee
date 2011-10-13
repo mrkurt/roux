@@ -26,4 +26,3 @@ module.exports = test.testCase
     runner.execWithIdRange(job, c, f)
   "Runner#exec should run mapReduce" : (test)->
     test.done()
-console.log module.exports

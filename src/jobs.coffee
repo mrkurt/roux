@@ -53,7 +53,6 @@ class Runner
       doc = {'$set' : {}}
       doc['$set'][lockField] = true
       sort = []
-      console.log lock
       @manager.findAndModify lock, sort, doc, {upsert : true}, (err, doc)=>
         if !err && !doc
           err = {type : 'roux_error', message : 'job is already locked for that collection'}
