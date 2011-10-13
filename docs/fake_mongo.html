@@ -1,0 +1,42 @@
+<!DOCTYPE html>  <html> <head>   <title>fake_mongo.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="fake_mongo.html">                 fake_mongo.coffee               </a>                                           <a class="source" href="index.html">                 index.coffee               </a>                                           <a class="source" href="mongo.html">                 mongo.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               fake_mongo.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>Fake Mongo attempts to run javascript functions like Mongo would. JS runs
+with an empty scope (by default) and a context that includes emulated versions of some of the 
+MongoDB javascript library functions.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">mongodb = </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;mongodb&#39;</span><span class="p">)</span>
+<span class="nv">crypto = </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;crypto&#39;</span><span class="p">)</span>
+<span class="nv">vm = </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;vm&#39;</span><span class="p">)</span>
+<span class="nv">fs = </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">)</span>
+
+<span class="nv">MongoContext = </span><span class="nf">(context)-&gt;</span>
+  <span class="k">if</span> <span class="nx">context</span><span class="o">?</span>
+    <span class="k">for</span> <span class="nx">own</span> <span class="nx">k</span><span class="p">,</span><span class="nx">v</span> <span class="k">of</span> <span class="nx">context</span>
+      <span class="err">@</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">v</span>
+  <span class="k">return</span>
+
+<span class="nv">MongoContext::hex_md5 = </span><span class="nf">(raw)-&gt;</span>
+    <span class="nv">h = </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">createHash</span><span class="p">(</span><span class="s1">&#39;md5&#39;</span><span class="p">)</span>
+    <span class="nx">h</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">raw</span><span class="p">)</span>
+    <span class="nx">h</span><span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="s1">&#39;hex&#39;</span><span class="p">)</span>
+
+<span class="nv">MongoContext::ObjectId = ObjectId = </span><span class="nf">(raw)-&gt;</span>
+  <span class="nv">id = </span><span class="nx">mongodb</span><span class="p">.</span><span class="nx">pure</span><span class="p">().</span><span class="nx">ObjectID</span><span class="p">(</span><span class="nx">raw</span><span class="p">)</span>
+  <span class="nv">id.getTimestamp = </span><span class="nf">()-&gt;</span>
+    <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">id</span><span class="p">.</span><span class="nx">generationTime</span><span class="p">)</span>
+  <span class="nx">id</span>
+
+<span class="nv">exports.runLikeMongo = </span><span class="nf">(fn, scope, context, args...)-&gt;</span>
+  <span class="nx">scope</span> <span class="o">||=</span> <span class="p">{}</span>
+  <span class="nx">args</span> <span class="o">||=</span> <span class="p">[]</span>
+  <span class="nv">context = </span><span class="k">new</span> <span class="nx">MongoContext</span><span class="p">(</span><span class="nx">context</span><span class="p">)</span>
+  <span class="nv">context.emits = emits = </span><span class="p">[]</span>
+  <span class="nv">context.emit = </span><span class="nf">(key,value)-&gt;</span>
+    <span class="nx">emits</span><span class="p">.</span><span class="nx">push</span> <span class="p">[</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">]</span>
+  <span class="nv">context.scope = </span><span class="nx">scope</span>
+  <span class="nv">context.args = </span><span class="nx">args</span>
+  <span class="nv">context.log = </span><span class="nf">(msg)-&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">msg</span><span class="p">)</span>
+  <span class="nv">context.result = </span><span class="kc">null</span>
+
+  <span class="nv">script = </span><span class="s2">&quot;result = (#{fn.toString()}).apply(scope, args);&quot;</span>
+
+  <span class="nx">vm</span><span class="p">.</span><span class="nx">runInNewContext</span><span class="p">(</span><span class="nx">script</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="s2">&quot;op.js&quot;</span><span class="p">)</span>
+  <span class="nx">context</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
