@@ -6,7 +6,7 @@
   { "type": "git"
   , "url": "https://github.com/mrkurt/roux.git"
   }
-, "main": "./lib/index.js"
+, "main": "./lib/roux/index"
 , "dependencies":
   { "mongodb" : "~0.9"
   , "underscore" : "~1.1"

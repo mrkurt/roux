@@ -1,6 +1,7 @@
 test = require('nodeunit')
-jobs = require('../src/jobs')
-mongo = require('../src/mongo')
+roux = require('../')
+jobs = roux.jobs
+mongo = roux.mongo
 
 db = new mongo.Database("mongodb://localhost/roux_test")
 runner = new jobs.Runner(db)

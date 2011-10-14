@@ -1,5 +1,5 @@
 test = require('nodeunit')
-roux = require('../src/index')
+roux = require('../')
 
 module.exports =
   "#fakeMongo exists" : (test)->

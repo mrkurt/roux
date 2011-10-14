@@ -1,5 +1,6 @@
 test = require('nodeunit')
-fakeMongo = require('../src/fake_mongo')
+roux = require('../')
+fakeMongo = roux.fakeMongo
 
 module.exports =
   "#runLikeMongo doesn't have node context" : (test)->

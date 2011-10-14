@@ -1,5 +1,6 @@
 test = require('nodeunit')
-mongo = require('../src/mongo')
+roux = require('../')
+mongo = roux.mongo
 
 db = false
 testMongo = (cb)->
