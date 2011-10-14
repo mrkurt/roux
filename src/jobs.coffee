@@ -30,7 +30,7 @@ exports.Storage = Storage
 
 outputCollectionName = (out)->
   return out if typeof out is 'string'
-  return false unless typeof out is 'object' && !out.inline
+  return '__inline__' if out.inline
   return out.replace || out.reduce || out.merge
 
 class Runner
@@ -38,7 +38,9 @@ class Runner
     mongo.Database.check(@db)
     @manager = @db.collection('roux.jobs')
 
-  execWithIdRange : (job, collection, f)->
+  execWithIdRange : (job, collection, query, f)->
+    f = query if typeof query is 'function'
+    query = {} unless typeof query is 'object'
     maxId = false
     minId = false
     @db.serverTime (err, value)=>
@@ -59,27 +61,31 @@ class Runner
         if err?
           f(err)
           return
-        minId = doc.collections?[collection.name]?[outputName]?.lastId || false
-        query = {'$lte' : maxId}
-        query['$gt'] = minId if minId
-        f(undefined, {_id : query})
+        minId = doc.collections?[collection.name]?[outputName]?.lastId
+        range = {'$lte' : maxId}
+        range['$gt'] = minId if minId
+        query['_id'] = range
+        f(undefined, query)
 
   exec : (job, opts, cb)->
     cb = opts if typeof opts is 'function'
     opts = {} unless typeof opts is 'object'
     collection = @db.collection(opts.input || job.input)
 
-    f = (err, query, finalize)=>
+    f = (err, query)=>
       if err?
         cb(err) if typeof cb is 'function'
         return
 
       query ||= {}
       o = {query : query, out: job.out, include_statistics: true}
-      @collection.mapReduce job.map, job.reduce, o, (err, collection, stats)=>
+      collection.mapReduce job.map, job.reduce, o, (err, collection, stats)=>
         cb(err, collection, stats) if typeof cb is 'function'
 
-    f(undefined, opts.query)
+    if job.incremental
+      @execWithIdRange(job, collection, opts.query, f)
+    else
+      f(undefined, opts.query)
 
 exports.Runner = Runner
 

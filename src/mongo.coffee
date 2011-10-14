@@ -89,7 +89,7 @@ class Collection
       return
 
 #proxying collection methods
-for m in ['insert', 'update', 'save', 'findAndModify']
+for m in ['insert', 'update', 'save', 'findAndModify', 'find', 'findOne', 'mapReduce']
   do(m)->
     Collection.prototype[m] = (args...)->
       @command(m, args)
