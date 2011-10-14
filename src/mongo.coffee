@@ -30,6 +30,12 @@ class Database
       @connecting = true
     return
 
+  close: (cb)->
+    @exec (error, db)=>
+      @connecting = false
+      @db.close(cb)
+      @db = false
+
   useCollection : (name, cb)->
     @exec (error, db)=>
       if error?

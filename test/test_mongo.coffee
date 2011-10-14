@@ -1,14 +1,28 @@
 test = require('nodeunit')
 mongo = require('../src/mongo')
 
+db = false
 testMongo = (cb)->
-  new mongo.Database "mongodb://localhost/roux_test", cb
+  db = new mongo.Database "mongodb://localhost/roux_test", cb
+  db
 
-module.exports =
+module.exports = test.testCase
+  setUp : (cb)->
+    cb()
+  tearDown : (cb)->
+    if db
+      db.close()
+      db = false
+    cb()
+
+  "Storage#store should save job map/reduce" : (test)->
+    test.done()
+
   "Database#constructor takes a URI and starts a connection" : (test)->
-    m = new mongo.Database "mongodb://localhost/roux_test", (err, db)->
+    m = testMongo (err, db)->
       test.equal "connected", db.state
       test.done()
+
   "Database#useCollection selects a collection properly" : (test)->
     m = testMongo()
     m.useCollection "beer", (error, c)->

@@ -9,7 +9,9 @@ module.exports = test.testCase
   setUp : (cb)->
     callback = (err, result)-> cb()
     db.collection('roux.jobs').command('drop', [callback])
-    
+  tearDown : (cb)->
+    db.close(cb)
+
   "Storage#store should save job map/reduce" : (test)->
     job = {name: 'testJob', map : (()-> "map"), reduce : (()-> "reduce")}
     s = new jobs.Storage(db)
